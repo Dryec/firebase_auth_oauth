@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.annotation.NonNull
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.OAuthCredential
 import com.google.firebase.auth.OAuthProvider
 import com.google.gson.Gson
@@ -64,15 +65,15 @@ class FirebaseAppleAuthPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
                         result.success("${oAuthCredential.accessToken}:${oAuthCredential.secret}")
                     } ?: result.success("")
                 }.addOnFailureListener { error ->
-                    result.error("100", error.localizedMessage, null)
+                    result.error((error as FirebaseAuthException).errorCode, error.localizedMessage, null)
                 }
             } else {
                 auth.startActivityForSignInWithProvider(it, provider).addOnSuccessListener { authResult ->
-                    (authResult.credential as? OAuthCredential)?.let { oAuthCredential ->
+                    (authResult.credential as? OAuthCredential)?.let(fun(oAuthCredential: OAuthCredential) {
                         result.success("${oAuthCredential.accessToken}:${oAuthCredential.secret}")
-                    } ?: result.success("")
+                    }) ?: result.success("")
                 }.addOnFailureListener { error ->
-                    result.error("200", error.localizedMessage, null)
+                    result.error((error as FirebaseAuthException).errorCode, error.localizedMessage, null)
                 }
             }
 

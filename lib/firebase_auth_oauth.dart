@@ -10,28 +10,28 @@ class FirebaseAuthOAuth {
   final FirebaseApp _app;
 
   static const MethodChannel _channel =
-  const MethodChannel('me.amryousef.apple.auth/firebase_apple_auth');
+      const MethodChannel('me.amryousef.apple.auth/firebase_apple_auth');
 
-  FirebaseAuthOAuth._({FirebaseApp app})
-      : _app = app ?? FirebaseApp.instance;
+  FirebaseAuthOAuth._({FirebaseApp app}) : _app = app ?? FirebaseApp.instance;
 
   factory FirebaseAuthOAuth() {
     return FirebaseAuthOAuth._();
   }
 
-  @override
-  Future<String> openSignInFlow(String provider, List<String> scopes,
-      [Map<String, String> customOAuthParameters]) async {
+  Future<String> openSignInFlow(
+      {@required String provider,
+      List<String> scopes = const [],
+      bool linkToCurrentUser = false,
+      Map<String, String> customOAuthParameters}) async {
     return await _channel.invokeMethod("openSignInFlow", {
       'provider': provider,
       'app': _app.name,
       'scopes': json.encode(scopes),
+      'link_credential': linkToCurrentUser,
       if (customOAuthParameters != null)
         'parameters': json.encode(customOAuthParameters)
     });
   }
 
-  @override
-  FirebaseAuthOAuth withApp(FirebaseApp app) =>
-      FirebaseAuthOAuth._(app: app);
+  FirebaseAuthOAuth withApp(FirebaseApp app) => FirebaseAuthOAuth._(app: app);
 }

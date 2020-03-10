@@ -11,7 +11,23 @@ class MyApp extends StatelessWidget {
   Future<void> performSignIn() async {
     try {
       await FirebaseAuthOAuth()
-          .openSignInFlow("apple.com", ["email"], {"locale": "en"});
+          .openSignInFlow(provider: "apple.com");
+    } on PlatformException {
+      debugPrint("error logging in");
+    }
+  }
+  Future<void> performSignInGoogle() async {
+    try {
+      await FirebaseAuthOAuth()
+          .openSignInFlow(provider: "google.com");
+    } on PlatformException {
+      debugPrint("error logging in");
+    }
+  }
+  Future<void> performSignInTwitter() async {
+    try {
+      await FirebaseAuthOAuth()
+          .openSignInFlow(provider: "twitter.com");
     } on PlatformException {
       debugPrint("error logging in");
     }
@@ -36,15 +52,39 @@ class MyApp extends StatelessWidget {
                   stream: FirebaseAuth.instance.onAuthStateChanged,
                   builder: (BuildContext context,
                       AsyncSnapshot<FirebaseUser> snapshot) {
-                    return RaisedButton(
-                      onPressed: () async {
-                        if (snapshot.data != null) {
-                          await FirebaseAuth.instance.signOut();
-                        } else {
-                          await performSignIn();
-                        }
-                      },
-                      child: Text(snapshot.data != null ? "Logout" : "Login"),
+                    return Column(
+                      children: <Widget>[
+                        RaisedButton(
+                          onPressed: () async {
+                            if (snapshot.data != null) {
+                              await FirebaseAuth.instance.signOut();
+                            } else {
+                              await performSignIn();
+                            }
+                          },
+                          child: Text(snapshot.data != null ? "Logout" : "Login"),
+                        ),
+                        RaisedButton(
+                          onPressed: () async {
+                            if (snapshot.data != null) {
+                              await FirebaseAuth.instance.signOut();
+                            } else {
+                              await performSignInGoogle();
+                            }
+                          },
+                          child: Text(snapshot.data != null ? "Logout" : "Login"),
+                        ),
+                        RaisedButton(
+                          onPressed: () async {
+                            if (snapshot.data != null) {
+                              await FirebaseAuth.instance.signOut();
+                            } else {
+                              await performSignInTwitter();
+                            }
+                          },
+                          child: Text(snapshot.data != null ? "Logout" : "Login"),
+                        ),
+                      ],
                     );
                   }),
             )
