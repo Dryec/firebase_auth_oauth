@@ -9,6 +9,7 @@ public class SwiftFirebaseAppleAuthPlugin: UIViewController, FlutterPlugin, ASAu
     private var currentNonce: String?
     var result: FlutterResult?
     var arguments: [String: Any]?
+    var provider: OAuthProvider?
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "me.amryousef.apple.auth/firebase_apple_auth", binaryMessenger: registrar.messenger())
@@ -33,7 +34,7 @@ public class SwiftFirebaseAppleAuthPlugin: UIViewController, FlutterPlugin, ASAu
         guard let providerId = arguments["provider"] as? String else {
             fatalError("provider can't be nil")
         }
-        let provider = OAuthProvider(providerID: providerId)
+        provider = OAuthProvider(providerID: providerId)
         guard let scopesString = arguments["scopes"] as? String else {
             fatalError("scopes can't be nil")
         }
@@ -45,7 +46,7 @@ public class SwiftFirebaseAppleAuthPlugin: UIViewController, FlutterPlugin, ASAu
             if let data = scopesString.data(using: .utf8) {
                 if let jsonArray = try JSONSerialization.jsonObject(with: data, options : .allowFragments) as? [String]
                 {
-                    provider.scopes = jsonArray
+                    self.provider!.scopes = jsonArray
                 } else {
                     fatalError("Invalid scopes list")
                 }
@@ -57,35 +58,27 @@ public class SwiftFirebaseAppleAuthPlugin: UIViewController, FlutterPlugin, ASAu
             if let data = parametersString?.data(using: .utf8) {
                 if let jsonObject = try JSONSerialization.jsonObject(with: data, options : .allowFragments) as? Dictionary<String, String>
                 {
-                    provider.customParameters = jsonObject
+                    self.provider!.customParameters = jsonObject
                 }
             }
-            provider.getCredentialWith(nil) { credential, error in
+            self.provider!.getCredentialWith(nil) { credential, error in
                 if error != nil {
-                    result(FlutterError.init(code: "200", message: error?.localizedDescription, details: nil))
+                    result(FlutterError.init(code: String(error!._code), message: error?.localizedDescription, details: nil))
                 }
                 if credential != nil {
                     if(linkWithCredential) {
                         Auth.auth().currentUser?.link(with: credential!) { authResult, error in
                             if error != nil {
-                                result(FlutterError.init(code: "100", message: error?.localizedDescription, details: nil))
+                                result(FlutterError.init(code: String(error!._code), message: error?.localizedDescription, details: nil))
                             }
-                            if let oAuthCredential = authResult?.credential as? OAuthCredential {
-                                result("\(oAuthCredential.accessToken ?? ""):\(oAuthCredential.secret ?? "")")
-                            } else {
-                                result("")
-                            }
+                            result("")
                         }
                     } else {
                         Auth.auth().signIn(with: credential!) { authResult, error in
                             if error != nil {
-                                result(FlutterError.init(code: "100", message: error?.localizedDescription, details: nil))
+                                result(FlutterError.init(code: String(error!._code), message: error?.localizedDescription, details: nil))
                             }
-                            if let oAuthCredential = authResult?.credential as? OAuthCredential {
-                                result("\(oAuthCredential.accessToken ?? ""):\(oAuthCredential.secret ?? "")")
-                            } else {
-                                result("")
-                            }
+                            result("")
                         }
                     }
                 }
@@ -202,26 +195,19 @@ public class SwiftFirebaseAppleAuthPlugin: UIViewController, FlutterPlugin, ASAu
             if((arguments!["link_credential"] as? Bool)!) {
                 Auth.auth().currentUser?.link(with: credential) { authResult, error in
                     if error != nil {
-                        self.result!(FlutterError.init(code: "100", message: error?.localizedDescription, details: nil))
+                        self.result!(FlutterError.init(code: String(error!._code), message: error?.localizedDescription, details: nil))
                     }
-                    if let oAuthCredential = authResult?.credential as? OAuthCredential {
-                        self.result!("\(oAuthCredential.accessToken ?? ""):\(oAuthCredential.secret ?? "")")
-                    } else {
-                        self.result!("")
-                    }
+                    self.result!("")
+                    
                 }
             } else {
                 Auth.auth().signIn(with: credential) { (authResult, error) in
                     if (error != nil) {
-                        self.result!(FlutterError.init(code: "100", message: error?.localizedDescription, details: nil))
+                        self.result!(FlutterError.init(code: String(error!._code), message: error?.localizedDescription, details: nil))
                         return
                     }
                     // User is signed in.
-                    if let oAuthCredential = authResult?.credential as? OAuthCredential {
-                        self.result!("\(oAuthCredential.accessToken ?? ""):\(oAuthCredential.secret ?? "")")
-                    } else {
-                        self.result!("")
-                    }
+                    self.result!("")
                 }
             }
         }
@@ -229,6 +215,6 @@ public class SwiftFirebaseAppleAuthPlugin: UIViewController, FlutterPlugin, ASAu
     
     @available(iOS 13.0, *)
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        self.result!(FlutterError.init(code: "200", message: error.localizedDescription, details: nil))
+        self.result!(FlutterError.init(code: "987546", message: error.localizedDescription, details: nil))
     }
 }
