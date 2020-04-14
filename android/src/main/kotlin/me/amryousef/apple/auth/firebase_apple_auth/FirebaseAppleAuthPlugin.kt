@@ -3,10 +3,7 @@ package me.amryousef.apple.auth.firebase_apple_auth
 import android.app.Activity
 import androidx.annotation.NonNull
 import com.google.firebase.FirebaseApp
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthException
-import com.google.firebase.auth.OAuthCredential
-import com.google.firebase.auth.OAuthProvider
+import com.google.firebase.auth.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -40,19 +37,64 @@ class FirebaseAppleAuthPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-        val providerBuilder = OAuthProvider.newBuilder(call.argument<String>("provider")!!)
-        val gson = Gson()
-        call.argument<String>("scopes")?.let {
-            providerBuilder.setScopes(gson.fromJson(it, object : TypeToken<List<String>>() {}.type))
+        result.notImplemented()
+/*
+        val providerId = call.argument<String>("provider")
+        val scopes = call.argument<String>("scopes")
+        val parameters = call.argument<String>("parameters")
+        val linkWithCredential = call.argument<Boolean>("link_credential")
+
+        when {
+            providerId == null -> {
+                result.error("InvalidProviderID", "provider can't be null", null)
+            }
+            scopes == null -> {
+                result.error("InvalidScopes", "scopes can't be null", null)
+            }
+            linkWithCredential == null -> {
+                result.error("InvalidLinkCredential", "link_credential can't be null", null)
+            }
+            else -> {
+                val gson = Gson()
+                val providerBuilder = OAuthProvider.newBuilder(providerId)
+                providerBuilder.setScopes(gson.fromJson(scopes, object : TypeToken<List<String>>() {}.type))
+                if (parameters != null) {
+                    providerBuilder.addCustomParameters(
+                            gson.fromJson<Map<String, String>>(
+                                    parameters,
+                                    object : TypeToken<Map<String, String>>() {}.type)
+                    )
+                }
+                val provider = providerBuilder.build()
+
+                activity?.let {
+                    val auth = call.argument<String>("app")?.let { appName ->
+                        FirebaseAuth.getInstance(FirebaseApp.getInstance(appName))
+                    } ?: FirebaseAuth.getInstance()
+                    val pending = auth.pendingAuthResult
+
+                    @Suppress("IfThenToElvis")
+                    if (pending != null) {
+                        pending.addOnSuccessListener { authResult ->
+                            (authResult.credential as? OAuthCredential)?.let { oAuthCredential ->
+                                result.success("${oAuthCredential.accessToken}:${oAuthCredential.secret}")
+                            } ?: result.success("")
+                        }.addOnFailureListener { error ->
+                            result.error((error as FirebaseAuthException).errorCode, error.localizedMessage, null)
+                        }
+                    } else {
+                        auth.startActivityForSignInWithProvider(it, provider).addOnSuccessListener { authResult ->
+                            (authResult.credential as? OAuthCredential)?.let(fun(oAuthCredential: OAuthCredential) {
+                                result.success("${oAuthCredential.accessToken}:${oAuthCredential.secret}")
+                            }) ?: result.success("")
+                        }.addOnFailureListener { error ->
+                            result.error((error as FirebaseAuthException).errorCode, error.localizedMessage, null)
+                        }
+                    }
+                }
+            }
         }
-        call.argument<String>("parameters")?.let {
-            providerBuilder.addCustomParameters(
-                    gson.fromJson<Map<String, String>>(
-                            it,
-                            object : TypeToken<Map<String, String>>() {}.type)
-            )
-        }
-        val provider = providerBuilder.build()
+
         activity?.let {
             val auth = call.argument<String>("app")?.let { appName ->
                 FirebaseAuth.getInstance(FirebaseApp.getInstance(appName))
@@ -77,7 +119,7 @@ class FirebaseAppleAuthPlugin : FlutterPlugin, ActivityAware, MethodCallHandler 
                 }
             }
 
-        }
+        }*/
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
