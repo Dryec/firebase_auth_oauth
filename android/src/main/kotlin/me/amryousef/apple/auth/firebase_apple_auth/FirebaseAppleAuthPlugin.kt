@@ -2,10 +2,6 @@ package me.amryousef.apple.auth.firebase_apple_auth
 
 import android.app.Activity
 import androidx.annotation.NonNull
-import com.google.firebase.FirebaseApp
-import com.google.firebase.auth.*
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding

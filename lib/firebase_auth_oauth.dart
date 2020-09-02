@@ -12,7 +12,7 @@ class FirebaseAuthOAuth {
   static const MethodChannel _channel =
       const MethodChannel('me.amryousef.apple.auth/firebase_apple_auth');
 
-  FirebaseAuthOAuth._({FirebaseApp app}) : _app = app ?? FirebaseApp.instance;
+  FirebaseAuthOAuth._({FirebaseApp app}) : _app = app ?? Firebase.app();
 
   factory FirebaseAuthOAuth() {
     return FirebaseAuthOAuth._();
