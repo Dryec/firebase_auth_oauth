@@ -3,6 +3,7 @@ import UIKit
 import AuthenticationServices
 import CryptoKit
 import FirebaseAuth
+import FirebaseCore
 
 public class SwiftFirebaseAppleAuthPlugin: UIViewController, FlutterPlugin, ASAuthorizationControllerDelegate {
     
@@ -41,6 +42,9 @@ public class SwiftFirebaseAppleAuthPlugin: UIViewController, FlutterPlugin, ASAu
         guard let linkWithCredential = arguments["link_credential"] as? Bool else {
             fatalError("link_credential can't be nil")
         }
+        guard let app = arguments["app"] as? String else {
+            fatalError("app can't be nil")
+        }
         let parametersString = arguments["parameters"] as? String
         do {
             if let data = scopesString.data(using: .utf8) {
@@ -67,14 +71,14 @@ public class SwiftFirebaseAppleAuthPlugin: UIViewController, FlutterPlugin, ASAu
                 }
                 if credential != nil {
                     if(linkWithCredential) {
-                        Auth.auth().currentUser?.link(with: credential!) { authResult, error in
+                        Auth.auth(app: FirebaseApp.app(name: app)!).currentUser?.link(with: credential!) { authResult, error in
                             if error != nil {
                                 result(FlutterError.init(code: String(error!._code), message: error?.localizedDescription, details: nil))
                             }
                             result("")
                         }
                     } else {
-                        Auth.auth().signIn(with: credential!) { authResult, error in
+                        Auth.auth(app: FirebaseApp.app(name: app)!).signIn(with: credential!) { authResult, error in
                             if error != nil {
                                 result(FlutterError.init(code: String(error!._code), message: error?.localizedDescription, details: nil))
                             }

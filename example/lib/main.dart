@@ -10,24 +10,23 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   Future<void> performSignIn() async {
     try {
-      await FirebaseAuthOAuth()
-          .openSignInFlow(provider: "apple.com");
+      await FirebaseAuthOAuth().openSignInFlow(provider: "apple.com");
     } on PlatformException {
       debugPrint("error logging in");
     }
   }
+
   Future<void> performSignInGoogle() async {
     try {
-      await FirebaseAuthOAuth()
-          .openSignInFlow(provider: "google.com");
+      await FirebaseAuthOAuth().openSignInFlow(provider: "google.com");
     } on PlatformException {
       debugPrint("error logging in");
     }
   }
+
   Future<void> performSignInTwitter() async {
     try {
-      await FirebaseAuthOAuth()
-          .openSignInFlow(provider: "twitter.com");
+      await FirebaseAuthOAuth().openSignInFlow(provider: "twitter.com");
     } on PlatformException {
       debugPrint("error logging in");
     }
@@ -35,7 +34,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    /*return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Plugin example app'),
@@ -91,6 +90,6 @@ class MyApp extends StatelessWidget {
           ],
         ),
       ),
-    );
+    );*/
   }
 }
